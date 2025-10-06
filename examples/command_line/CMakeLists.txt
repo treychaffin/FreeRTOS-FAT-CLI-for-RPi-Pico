@@ -1,4 +1,4 @@
-# == DO NEVER EDIT THE NEXT LINES for Raspberry Pi Pico VS Code Extension to work ==
+# == DO NOT EDIT THE FOLLOWING LINES for the Raspberry Pi Pico VS Code Extension to work ==
 if(WIN32)
     set(USERHOME $ENV{USERPROFILE})
 else()
@@ -14,7 +14,7 @@ endif()
 # ====================================================================================
 cmake_minimum_required(VERSION 3.13)
 
-set(PICO_BOARD pico CACHE STRING "Board type")
+set(PICO_BOARD adafruit_feather_rp2040 CACHE STRING "Board type")
 
 set(FREERTOS_KERNEL_PATH $ENV{FREERTOS_KERNEL_PATH})
 set(PROGRAM_NAME command_line)
@@ -40,7 +40,7 @@ add_subdirectory(../../src/FreeRTOS+FAT+CLI build)
 
 # Add executable. Default name is the project name, version 0.1
 add_executable(${PROGRAM_NAME} 
-    config/hw_config.c
+    config/adafruit_feather_rp2040.hw_config.c
     src/command.cpp
     src/data_log_demo.c
     src/main.cpp 
@@ -73,9 +73,12 @@ target_compile_definitions(${PROGRAM_NAME} PUBLIC
 target_compile_definitions(${PROGRAM_NAME} PRIVATE
     # This program is useless without standard input and output.
     USE_PRINTF
-    #USE_DBG_PRINTF
+    USE_DBG_PRINTF
 
-    #SPI_SD0
+    # Enable SPI debugging
+    SPI_SD0
+    # Enable more verbose SD card debugging
+    SD_DEBUG=1
 )
 
 # Disable CRC checking for SPI-attached cards.
