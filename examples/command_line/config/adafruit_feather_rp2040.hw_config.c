@@ -38,13 +38,11 @@ static spi_t spis[] = {  // One for each RP2040 SPI component used
         .mosi_gpio = 19,  // MOSI pin (PIN_SD_CMD_MOSI) 
         .miso_gpio = 20,  // MISO pin (PIN_SD_DAT0_MISO)
         .set_drive_strength = true,
-        .mosi_gpio_drive_strength = GPIO_DRIVE_STRENGTH_4MA,
-        .sck_gpio_drive_strength = GPIO_DRIVE_STRENGTH_12MA,
-        .no_miso_gpio_pull_up = true,
+        .mosi_gpio_drive_strength = GPIO_DRIVE_STRENGTH_4MA,  // MOSI
+        .sck_gpio_drive_strength = GPIO_DRIVE_STRENGTH_8MA,   // SCK (clock needs good edges)
+        .no_miso_gpio_pull_up = true,  // Standard configuration
         .DMA_IRQ_num = DMA_IRQ_0,
-        // Start with slower speed for better compatibility
-        .baud_rate = 125 * 1000 * 1000 / 12  // ~10.4 MHz (slower for debugging)
-        //.baud_rate = 125 * 1000 * 1000 / 8  // 15625000 Hz (16MHz like Arduino)
+        .baud_rate = 125 * 1000 * 1000 / 8  // 15625000 Hz
     }
 };
 
@@ -65,12 +63,12 @@ static sd_card_t sd_cards[] = {  // One for each SD card
         .mount_point = "/sd0",
         .type = SD_IF_SPI,
         .spi_if_p = &spi_ifs[0],  // Pointer to the SPI interface driving this card
-        // SD Card detect: DISABLE temporarily to test SPI communication
-        .use_card_detect = false,
-        .card_detect_gpio = -1,   // Not used when disabled
-        .card_detected_true = 0,  
-        .card_detect_use_pull = false,
-        .card_detect_pull_hi = false                           
+        // SD Card detect: ENABLE with proper debouncing
+        .use_card_detect = true,
+        .card_detect_gpio = 16,   // PIN_CARD_DETECT from Arduino (GPIO 16)
+        .card_detected_true = 1,  // Active high: 1 = card present, 0 = card absent
+        .card_detect_use_pull = true,
+        .card_detect_pull_hi = true  // Pull-up resistor for stable detection                          
     }
 };
 
